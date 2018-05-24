@@ -1,0 +1,730 @@
+<!DOCTYPE html>
+
+
+
+  
+
+
+<html class="theme-next mist use-motion" lang="">
+<head>
+  <meta charset="UTF-8"/>
+<meta http-equiv="X-UA-Compatible" content="IE=edge" />
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1"/>
+<meta name="theme-color" content="#222">
+
+
+
+
+
+
+
+
+
+<meta http-equiv="Cache-Control" content="no-transform" />
+<meta http-equiv="Cache-Control" content="no-siteapp" />
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+  <link href="/lib/fancybox/source/jquery.fancybox.css?v=2.1.5" rel="stylesheet" type="text/css" />
+
+
+
+
+
+
+
+<link href="/lib/font-awesome/css/font-awesome.min.css?v=4.6.2" rel="stylesheet" type="text/css" />
+
+<link href="/css/main.css?v=5.1.4" rel="stylesheet" type="text/css" />
+
+
+  <link rel="apple-touch-icon" sizes="180x180" href="/images/apple-touch-icon-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="32x32" href="/images/favicon-32x32-next.png?v=5.1.4">
+
+
+  <link rel="icon" type="image/png" sizes="16x16" href="/images/favicon-16x16-next.png?v=5.1.4">
+
+
+  <link rel="mask-icon" href="/images/logo.svg?v=5.1.4" color="#222">
+
+
+
+
+
+  <meta name="keywords" content="Hexo, NexT" />
+
+
+
+
+
+
+
+
+
+
+<meta name="description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=train.corr()np">
+<meta property="og:type" content="article">
+<meta property="og:title" content="机器学习实践(1)--建模流程">
+<meta property="og:url" content="http://yoursite.com/2018/04/17/机器学习问题解决思路/index.html">
+<meta property="og:site_name" content="123随手记">
+<meta property="og:description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=train.corr()np">
+<meta property="og:locale" content="default">
+<meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/Pearson.png">
+<meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_2.jpg">
+<meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_1.jpg">
+<meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_3.jpg">
+<meta property="og:updated_time" content="2018-04-25T06:59:08.170Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="机器学习实践(1)--建模流程">
+<meta name="twitter:description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=train.corr()np">
+<meta name="twitter:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/Pearson.png">
+
+
+
+<script type="text/javascript" id="hexo.configurations">
+  var NexT = window.NexT || {};
+  var CONFIG = {
+    root: '/',
+    scheme: 'Mist',
+    version: '5.1.4',
+    sidebar: {"position":"left","display":"post","offset":12,"b2t":false,"scrollpercent":false,"onmobile":false},
+    fancybox: true,
+    tabs: true,
+    motion: {"enable":true,"async":false,"transition":{"post_block":"fadeIn","post_header":"slideDownIn","post_body":"slideDownIn","coll_header":"slideLeftIn","sidebar":"slideUpIn"}},
+    duoshuo: {
+      userId: '0',
+      author: 'Author'
+    },
+    algolia: {
+      applicationID: '',
+      apiKey: '',
+      indexName: '',
+      hits: {"per_page":10},
+      labels: {"input_placeholder":"Search for Posts","hits_empty":"We didn't find any results for the search: ${query}","hits_stats":"${hits} results found in ${time} ms"}
+    }
+  };
+</script>
+
+
+
+  <link rel="canonical" href="http://yoursite.com/2018/04/17/机器学习问题解决思路/"/>
+
+
+
+
+
+  <title>机器学习实践(1)--建模流程 | 123随手记</title>
+  
+
+
+
+
+
+
+
+
+</head>
+
+<body itemscope itemtype="http://schema.org/WebPage" lang="default">
+
+  
+  
+    
+  
+
+  <div class="container sidebar-position-left page-post-detail">
+    <div class="headband"></div>
+
+    <header id="header" class="header" itemscope itemtype="http://schema.org/WPHeader">
+      <div class="header-inner"><div class="site-brand-wrapper">
+  <div class="site-meta ">
+    
+
+    <div class="custom-logo-site-title">
+      <a href="/"  class="brand" rel="start">
+        <span class="logo-line-before"><i></i></span>
+        <span class="site-title">123随手记</span>
+        <span class="logo-line-after"><i></i></span>
+      </a>
+    </div>
+      
+        <p class="site-subtitle"></p>
+      
+  </div>
+
+  <div class="site-nav-toggle">
+    <button>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+      <span class="btn-bar"></span>
+    </button>
+  </div>
+</div>
+
+<nav class="site-nav">
+  
+
+  
+    <ul id="menu" class="menu">
+      
+        
+        <li class="menu-item menu-item-home">
+          <a href="/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-home"></i> <br />
+            
+            Home
+          </a>
+        </li>
+      
+        
+        <li class="menu-item menu-item-archives">
+          <a href="/archives/" rel="section">
+            
+              <i class="menu-item-icon fa fa-fw fa-archive"></i> <br />
+            
+            Archives
+          </a>
+        </li>
+      
+
+      
+    </ul>
+  
+
+  
+</nav>
+
+
+
+ </div>
+    </header>
+
+    <main id="main" class="main">
+      <div class="main-inner">
+        <div class="content-wrap">
+          <div id="content" class="content">
+            
+
+  <div id="posts" class="posts-expand">
+    
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/04/17/机器学习问题解决思路/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangying">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="123随手记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">机器学习实践(1)--建模流程</h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-04-17T18:38:36+08:00">
+                2018-04-17
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        <h2 id="数据概览"><a href="#数据概览" class="headerlink" title="数据概览"></a>数据概览</h2><p>第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？</p>
+<ul>
+<li>数据类型？</li>
+<li>有哪些类型需要转换？</li>
+<li>有没有数据缺失？</li>
+<li>特征之间的相关性？</li>
+</ul>
+<h3 id="review"><a href="#review" class="headerlink" title="review"></a>review</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">train = pd.read_csv(path + <span class="string">'train.csv'</span>)  </span><br><span class="line">train.head(<span class="number">3</span>)</span><br><span class="line">train.info()</span><br><span class="line">trian.describe()</span><br></pre></td></tr></table></figure>
+<h3 id="相关性"><a href="#相关性" class="headerlink" title="相关性"></a>相关性</h3><h4 id="相关系数"><a href="#相关系数" class="headerlink" title="相关系数"></a>相关系数</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">train_corr=train.corr()</span><br><span class="line">np.fill_diagonal(train_corr.values, np.nan)   <span class="comment">#填充对角线</span></span><br><span class="line">train_corr[train_corr&gt;<span class="number">0.9</span>].unstack().dropna().to_frame()</span><br></pre></td></tr></table></figure>
+<h4 id="皮尔森相关性"><a href="#皮尔森相关性" class="headerlink" title="皮尔森相关性"></a>皮尔森相关性</h4><p>Pearson Correlation Heatmap，生成一个热力图<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">colormap = plt.cm.RdBu</span><br><span class="line">plt.figure(figsize=(<span class="number">14</span>,<span class="number">12</span>))    <span class="comment">#太小了看不清字</span></span><br><span class="line">sns.heatmap(train.astype(float).corr(),linewidths=<span class="number">0.1</span>,vmax=<span class="number">1.0</span>, </span><br><span class="line">            square=<span class="keyword">True</span>, cmap=colormap, linecolor=<span class="string">'white'</span>, annot=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure></p>
+<img src="http://p7fcyd9m7.bkt.clouddn.com/images/Pearson.png">
+<p>相关系数绝对值越大，相关性越强，0.5以上就算是相关性比较强了。<br>总的来看，这个图中没有太多相关性很强的特征，这是件好事，说明没有太多的亢余数据，每个特征携带不同的信息。<br>图中，family size 和parch，有很强的相关性，可以先留着。</p>
+<h2 id="特征工程"><a href="#特征工程" class="headerlink" title="特征工程"></a>特征工程</h2><p>特征工程简单的说就是两个问题：看看这个特征好不好？特征要以什么样的形式放到模型中？</p>
+<h3 id="怎么判断这个特征好不好呢？"><a href="#怎么判断这个特征好不好呢？" class="headerlink" title="怎么判断这个特征好不好呢？"></a>怎么判断这个特征好不好呢？</h3><p>即看看这个特征相对于目标值是否区分明显，主要有下面几个点：</p>
+<ul>
+<li>计数、均值、方差</li>
+<li>单个特征分布的区分度</li>
+<li>组合特征区分度</li>
+</ul>
+<h4 id="首先计数和均值："><a href="#首先计数和均值：" class="headerlink" title="首先计数和均值："></a>首先计数和均值：</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">train.Sex.value_counts()</span><br><span class="line">train.groupby(<span class="string">'Sex'</span>)[<span class="string">'Survived'</span>].mean()</span><br></pre></td></tr></table></figure>
+<p>这里目标值为”Survived；”Sex”是一个分类特征。</p>
+<img src="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_2.jpg">
+<p>我们看到，男性的人数比较多，而女性的生存概率确更高。所以这是一个很有区分度的特征</p>
+<h4 id="再来看下分布特征"><a href="#再来看下分布特征" class="headerlink" title="再来看下分布特征"></a>再来看下分布特征</h4><img src="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_1.jpg">
+<p>这是一个三类的分类特征，柱状图可以看出，在pclass3中死亡率是最高的，pclass1的死亡率是最低的，这也是一个较好的特征。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"></span><br><span class="line">y_dead = train[train.Survived==<span class="number">0</span>].groupby(<span class="string">'Pclass'</span>)[<span class="string">'Survived'</span>].count()</span><br><span class="line">y_alive = train[train.Survived==<span class="number">1</span>].groupby(<span class="string">'Pclass'</span>)[<span class="string">'Survived'</span>].count()</span><br><span class="line">pos = [<span class="number">1</span>, <span class="number">2</span>, <span class="number">3</span>]</span><br><span class="line">ax = plt.figure(figsize=(<span class="number">8</span>,<span class="number">4</span>)).add_subplot(<span class="number">111</span>)</span><br><span class="line">ax.bar(pos, y_dead, color=<span class="string">'r'</span>, alpha=<span class="number">0.6</span>, label=<span class="string">'dead'</span>)</span><br><span class="line">ax.bar(pos, y_alive, color=<span class="string">'g'</span>, bottom=y_dead, alpha=<span class="number">0.6</span>, label=<span class="string">'alive'</span>)</span><br><span class="line">ax.legend(fontsize=<span class="number">16</span>, loc=<span class="string">'best'</span>)</span><br></pre></td></tr></table></figure></p>
+<img src="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_3.jpg">
+<p>如果是连续特征用柱状图就不太合适了~<br>这个特征是”Age”,由于特征缺失，所以填充-20，所以0之前的部分可以忽略不计。总趋势上来看年龄的分布比较宽，而且非线性关系，所以如果采用非树模型，要对这个特征做离散处理，带入模型。<br>另外，小孩的获救率相对比较高，在后面可以生成特征<br>“isChild”.<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> scipy <span class="keyword">import</span> stats</span><br><span class="line">fig, axes = plt.subplots(<span class="number">2</span>,<span class="number">1</span>,figsize=(<span class="number">8</span>,<span class="number">6</span>))</span><br><span class="line">sns.set_style(<span class="string">'white'</span>)</span><br><span class="line">ax1 = axes[<span class="number">1</span>]</span><br><span class="line">ax1.set_title(<span class="string">'age survived distribution'</span>)</span><br><span class="line">k1 = sns.distplot(train[train.Survived==<span class="number">0</span>].Age.fillna(<span class="number">-20</span>), hist=<span class="keyword">False</span>, color=<span class="string">'r'</span>, ax=ax1, label=<span class="string">'dead'</span>)</span><br><span class="line">k2 = sns.distplot(train[train.Survived==<span class="number">1</span>].Age.fillna(<span class="number">-20</span>), hist=<span class="keyword">False</span>, color=<span class="string">'g'</span>, ax=ax1, label=<span class="string">'alive'</span>)</span><br><span class="line">ax1.set_xlabel(<span class="string">''</span>)</span><br></pre></td></tr></table></figure></p>
+<h3 id="特征处理"><a href="#特征处理" class="headerlink" title="特征处理"></a>特征处理</h3><ul>
+<li>缺失值</li>
+<li>列表或字典特征</li>
+<li>数值特征</li>
+<li>分类特征</li>
+<li>scaling</li>
+<li>群组特征</li>
+<li>onehot</li>
+</ul>
+<h4 id="缺失值"><a href="#缺失值" class="headerlink" title="缺失值"></a>缺失值</h4><p>遇到缺失值问题，首先先看看缺失的量，如果可以，就对该特征进行填充。<br>如果特征值为连续值，按照不同的分布类型对缺失值进行补全：偏正态分布，用均值代替，可以保持数据的均值；偏长尾分布，使用中指代替，避免受outlier影响。<br>如果特征值为离散值，使用众数代替。</p>
+<p>另外缺失本身有时候也可以做为一个特征，即如果在负样本的缺失情况远高于正样本，那么说明”ifnull”也是一个有区分度的特征</p>
+<h5 id="统计缺失量"><a href="#统计缺失量" class="headerlink" title="统计缺失量"></a>统计缺失量</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">train.Age.isnull().value_counts()   <span class="comment">#缺失量</span></span><br><span class="line">train.groupby(by=train.Age.isnull())[<span class="string">'Survived'</span>].mean() <span class="comment">#缺失比例</span></span><br></pre></td></tr></table></figure>
+<h5 id="原字段填充"><a href="#原字段填充" class="headerlink" title="原字段填充"></a>原字段填充</h5><ul>
+<li><p>离散值填充</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataset[<span class="string">'Embarked'</span>] = dataset[<span class="string">'Embarked'</span>].fillna(<span class="string">'S'</span>)</span><br></pre></td></tr></table></figure>
+</li>
+<li><p>连续值填充</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#中位数填充</span></span><br><span class="line">dataset[<span class="string">'Fare'</span>] = dataset[<span class="string">'Fare'</span>].fillna(train[<span class="string">'Fare'</span>].median())</span><br><span class="line"></span><br><span class="line"><span class="comment">#或者根据根据最大最小区间，随机生成</span></span><br><span class="line">age_avg = dataset[<span class="string">'Age'</span>].mean()</span><br><span class="line">age_std = dataset[<span class="string">'Age'</span>].std()</span><br><span class="line">age_null_count = dataset[<span class="string">'Age'</span>].isnull().sum()</span><br><span class="line">age_null_random_list = np.random.randint(age_avg - age_std, age_avg + age_std,size=age_null_count)</span><br><span class="line">dataset[<span class="string">'Age'</span>][np.isnan(dataset[<span class="string">'Age'</span>])] = age_null_random_list</span><br><span class="line">dataset[<span class="string">'Age'</span>] = dataset[<span class="string">'Age'</span>].astype(int)</span><br></pre></td></tr></table></figure>
+</li>
+</ul>
+<h5 id="将缺失设置为特征"><a href="#将缺失设置为特征" class="headerlink" title="将缺失设置为特征"></a>将缺失设置为特征</h5><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">train[<span class="string">'Cabin'</span>] = train[<span class="string">'Cabin'</span>].isnull().apply(<span class="keyword">lambda</span> x:<span class="string">'Null'</span> <span class="keyword">if</span> x <span class="keyword">is</span> <span class="keyword">True</span> <span class="keyword">else</span> <span class="string">'Not True'</span>)</span><br><span class="line">test[<span class="string">'Cabin'</span>] = test[<span class="string">'Cabin'</span>].isnull().apply(<span class="keyword">lambda</span> x:<span class="string">'Null'</span> <span class="keyword">if</span> x <span class="keyword">is</span> <span class="keyword">True</span> <span class="keyword">else</span> <span class="string">'Not True'</span>)</span><br></pre></td></tr></table></figure>
+<h4 id="列表特征"><a href="#列表特征" class="headerlink" title="列表特征"></a>列表特征</h4><p>这个很多处理方法，根据具体情况而定。<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#提取长度</span></span><br><span class="line">train[<span class="string">'Name_length'</span>] = train[<span class="string">'Name'</span>].apply(len)</span><br><span class="line"></span><br><span class="line">train.Cabin.apply(<span class="keyword">lambda</span> x:len(x) <span class="keyword">if</span> (x <span class="keyword">is</span> <span class="keyword">not</span> np.nan) <span class="keyword">else</span> <span class="number">0</span>)&gt;<span class="number">4</span></span><br><span class="line"></span><br><span class="line"><span class="comment">#取第一个</span></span><br><span class="line">train[<span class="string">'cabin_zone'</span>] = train.Cabin.fillna(<span class="string">'0'</span>).str.split(<span class="string">' '</span>).apply(<span class="keyword">lambda</span> x:[<span class="number">0</span>][<span class="number">0</span>])</span><br></pre></td></tr></table></figure></p>
+<h4 id="数值特征"><a href="#数值特征" class="headerlink" title="数值特征"></a>数值特征</h4><p>在基于树的模型大可以不必离散化，毕竟分割起来都一样。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#转化序数</span></span><br><span class="line">dataset.loc[ dataset[<span class="string">'Age'</span>] &lt;= <span class="number">16</span>, <span class="string">'Age'</span>]                  = <span class="number">0</span></span><br><span class="line">dataset.loc[(dataset[<span class="string">'Age'</span>] &gt; <span class="number">16</span>) &amp; (dataset[<span class="string">'Age'</span>] &lt;= <span class="number">32</span>), <span class="string">'Age'</span>] = <span class="number">1</span></span><br><span class="line">dataset.loc[(dataset[<span class="string">'Age'</span>] &gt; <span class="number">32</span>) &amp; (dataset[<span class="string">'Age'</span>] &lt;= <span class="number">48</span>), <span class="string">'Age'</span>] = <span class="number">2</span></span><br><span class="line">dataset.loc[(dataset[<span class="string">'Age'</span>] &gt; <span class="number">48</span>) &amp; (dataset[<span class="string">'Age'</span>] &lt;= <span class="number">64</span>), <span class="string">'Age'</span>] = <span class="number">3</span></span><br><span class="line">dataset.loc[ dataset[<span class="string">'Age'</span>] &gt; <span class="number">64</span>, <span class="string">'Age'</span>] = <span class="number">4</span> ;</span><br></pre></td></tr></table></figure>
+<p>还有另外的写法：<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">#划分为value_count相同的4个区间，如果值的跨度比较大，倾向于这种</span></span><br><span class="line">train[<span class="string">'CategoricalFare'</span>] = pd.qcut(train[<span class="string">'Fare'</span>], <span class="number">4</span>)</span><br><span class="line"><span class="comment">#按照fare均匀划分为四个区间</span></span><br><span class="line">train[<span class="string">'CategoricalFare'</span>] = pd.cut(train[<span class="string">'Fare'</span>], <span class="number">4</span>)</span><br></pre></td></tr></table></figure></p>
+<h4 id="分类特征"><a href="#分类特征" class="headerlink" title="分类特征"></a>分类特征</h4><p>视情况转化为序数<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">dataset[<span class="string">'Sex'</span>] = dataset[<span class="string">'Sex'</span>].map( &#123;<span class="string">'female'</span>: <span class="number">0</span>, <span class="string">'male'</span>: <span class="number">1</span>&#125; ).astype(int)</span><br></pre></td></tr></table></figure></p>
+<h4 id="群组特征"><a href="#群组特征" class="headerlink" title="群组特征"></a>群组特征</h4><p>有些人可能可以被划分到一个组中，比如一个家庭，这个家庭具有相同的漠视，就可以作为一个组</p>
+<h4 id="scaling"><a href="#scaling" class="headerlink" title="scaling"></a>scaling</h4><p>分布比较宽的特征有时就需要做scaling（for trainset and testset），加速收敛。</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">import</span> sklearn.preprocessing <span class="keyword">as</span> preprocessing</span><br><span class="line">scaler = preprocessing.StandardScaler()</span><br><span class="line"><span class="comment">#Fare</span></span><br><span class="line">fare_scale_param = scaler.fit(train[<span class="string">'Fare'</span>].values.reshape(<span class="number">-1</span>, <span class="number">1</span>))</span><br><span class="line">train.Fare = fare_scale_param.transform(train[<span class="string">'Fare'</span>].values.reshape(<span class="number">-1</span>, <span class="number">1</span>))</span><br><span class="line">test.Fare = fare_scale_param.transform(test[<span class="string">'Fare'</span>].values.reshape(<span class="number">-1</span>, <span class="number">1</span>))</span><br></pre></td></tr></table></figure>
+<h4 id="onehot"><a href="#onehot" class="headerlink" title="onehot"></a>onehot</h4><p>记得对训练集和测试集都onehot</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">train_x = pd.concat([train[[<span class="string">'SibSp'</span>,<span class="string">'Parch'</span>,<span class="string">'Fare'</span>]], pd.get_dummies()</span><br><span class="line">train_y = train.Survived</span><br><span class="line">test_x = pd.concat([test[[<span class="string">'SibSp'</span>,<span class="string">'Parch'</span>,<span class="string">'Fare'</span>]], pd.get_dummies()</span><br></pre></td></tr></table></figure>
+<h3 id="使用模型筛选特征"><a href="#使用模型筛选特征" class="headerlink" title="使用模型筛选特征"></a>使用模型筛选特征</h3><p>模型有个贡献度的概念，不同的模型可能计算方法不太一样，下面随机森林</p>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> train_test_split</span><br><span class="line"><span class="keyword">from</span> sklearn.feature_selection <span class="keyword">import</span> SelectFromModel</span><br><span class="line"></span><br><span class="line"><span class="comment">#分割训练集和验证集</span></span><br><span class="line">train, validation = train_test_split(data, test_size=<span class="number">0.2</span></span><br><span class="line">                                     ,random_state=SEED</span><br><span class="line">                                    )</span><br><span class="line">Y_train,Y_validation=train[<span class="string">'label'</span>],validation[<span class="string">'label'</span>]</span><br><span class="line">X_train,X_validation=train.drop(<span class="string">'label'</span>,axis=<span class="number">1</span>),validation.drop(<span class="string">'label'</span>,axis=<span class="number">1</span>)</span><br><span class="line"><span class="comment">#选择一个学习算法</span></span><br><span class="line"></span><br><span class="line">clf=RandomForestClassifier(n_estimators=<span class="number">200</span>,</span><br><span class="line">                          class_weight=<span class="string">'balanced'</span>,</span><br><span class="line">                          )</span><br><span class="line">clf.fit(X_train, Y_train)</span><br><span class="line">clf.score(X_validation,Y_validation)</span><br><span class="line"><span class="comment">#混淆矩阵</span></span><br><span class="line">metrics.confusion_matrix(Y_validation,clf.predict(X_validation) )</span><br><span class="line">​<span class="comment">#特征重要性</span></span><br><span class="line">feature_imp=pd.Series(clf.feature_importances_,index=X_train.columns).sort_values(ascending=<span class="keyword">False</span>)</span><br><span class="line">important_feats = list(feature_imp[:<span class="number">5</span>].index)  <span class="comment">#这就是贡献度比较高的特征</span></span><br></pre></td></tr></table></figure>
+<p>不同的模型（随机森林、dbdt、xgboost等）得到的特征的贡献率可能不同，可以根据多个模型的贡献率计算一个平均值，然后筛选均值较高的贡献度。<br>贡献度的加和不等于1，至于要不要归一化，待定~</p>
+<h2 id="模型调参"><a href="#模型调参" class="headerlink" title="模型调参"></a>模型调参</h2><blockquote>
+<p>这里简单的放点代码，将来系统的写一篇。</p>
+</blockquote>
+<figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br></pre></td><td class="code"><pre><span class="line">                          )</span><br><span class="line"><span class="keyword">from</span> sklearn.model_selection <span class="keyword">import</span> GridSearchCV</span><br><span class="line">gs=GridSearchCV(clf,</span><br><span class="line">            param_grid=&#123;</span><br><span class="line">                <span class="string">'n_estimators'</span>:[<span class="number">10</span>,<span class="number">30</span>,<span class="number">50</span>,<span class="number">100</span>,<span class="number">150</span>,<span class="number">200</span>],</span><br><span class="line">                <span class="string">'max_depth'</span>:[<span class="number">6</span>,<span class="number">12</span>,<span class="number">18</span>],</span><br><span class="line"></span><br><span class="line">            &#125;,</span><br><span class="line">                 n_jobs=<span class="number">-1</span>,</span><br><span class="line">                cv=<span class="number">5</span>,</span><br><span class="line">                 scoring=<span class="string">'recall'</span>,</span><br><span class="line">            )</span><br><span class="line"></span><br><span class="line">gs.fit(sample_features.drop(<span class="string">'label'</span>,axis=<span class="number">1</span>),sample_features[<span class="string">'label'</span>])</span><br><span class="line"></span><br><span class="line">gs.grid_scores_, gs.best_params_, gs.best_score_</span><br></pre></td></tr></table></figure>
+<p>其中clf为选择的模型，param_grid是需要调整的参数</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://zhuanlan.zhihu.com/p/27550334" target="_blank" rel="noopener">分分钟，杀入Kaggle TOP 5% 系列</a><br><a href="https://zhuanlan.zhihu.com/p/33096877" target="_blank" rel="noopener">Kaggle 数据挖掘比赛经验分享</a><br><a href="https://www.kaggle.com/arthurtok/introduction-to-ensembling-stacking-in-python" target="_blank" rel="noopener">Introduction to Ensembling/Stacking in Python</a></p>
+
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+      
+      
+
+      
+        <div class="post-nav">
+          <div class="post-nav-next post-nav-item">
+            
+              <a href="/2018/04/17/hello-world/" rel="next" title="Hello World">
+                <i class="fa fa-chevron-left"></i> Hello World
+              </a>
+            
+          </div>
+
+          <span class="post-nav-divider"></span>
+
+          <div class="post-nav-prev post-nav-item">
+            
+              <a href="/2018/05/23/终于整明白之Python线程&进程/" rel="prev" title="终于整明白之Python线程&进程">
+                终于整明白之Python线程&进程 <i class="fa fa-chevron-right"></i>
+              </a>
+            
+          </div>
+        </div>
+      
+
+      
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+
+    <div class="post-spread">
+      
+    </div>
+  </div>
+
+
+          </div>
+          
+
+
+          
+
+  
+
+
+
+        </div>
+        
+          
+  
+  <div class="sidebar-toggle">
+    <div class="sidebar-toggle-line-wrap">
+      <span class="sidebar-toggle-line sidebar-toggle-line-first"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-middle"></span>
+      <span class="sidebar-toggle-line sidebar-toggle-line-last"></span>
+    </div>
+  </div>
+
+  <aside id="sidebar" class="sidebar">
+    
+    <div class="sidebar-inner">
+
+      
+
+      
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
+
+      <section class="site-overview-wrap sidebar-panel">
+        <div class="site-overview">
+          <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
+            
+              <p class="site-author-name" itemprop="name">wangying</p>
+              <p class="site-description motion-element" itemprop="description"></p>
+          </div>
+
+          <nav class="site-state motion-element">
+
+            
+              <div class="site-state-item site-state-posts">
+              
+                <a href="/archives/">
+              
+                  <span class="site-state-item-count">5</span>
+                  <span class="site-state-item-name">posts</span>
+                </a>
+              </div>
+            
+
+            
+
+            
+
+          </nav>
+
+          
+
+          
+
+          
+          
+
+          
+          
+
+          
+
+        </div>
+      </section>
+
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#数据概览"><span class="nav-number">1.</span> <span class="nav-text">数据概览</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#review"><span class="nav-number">1.1.</span> <span class="nav-text">review</span></a></li><li class="nav-item nav-level-3"><a class="nav-link" href="#相关性"><span class="nav-number">1.2.</span> <span class="nav-text">相关性</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#相关系数"><span class="nav-number">1.2.1.</span> <span class="nav-text">相关系数</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#皮尔森相关性"><span class="nav-number">1.2.2.</span> <span class="nav-text">皮尔森相关性</span></a></li></ol></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#特征工程"><span class="nav-number">2.</span> <span class="nav-text">特征工程</span></a><ol class="nav-child"><li class="nav-item nav-level-3"><a class="nav-link" href="#怎么判断这个特征好不好呢？"><span class="nav-number">2.1.</span> <span class="nav-text">怎么判断这个特征好不好呢？</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#首先计数和均值："><span class="nav-number">2.1.1.</span> <span class="nav-text">首先计数和均值：</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#再来看下分布特征"><span class="nav-number">2.1.2.</span> <span class="nav-text">再来看下分布特征</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#特征处理"><span class="nav-number">2.2.</span> <span class="nav-text">特征处理</span></a><ol class="nav-child"><li class="nav-item nav-level-4"><a class="nav-link" href="#缺失值"><span class="nav-number">2.2.1.</span> <span class="nav-text">缺失值</span></a><ol class="nav-child"><li class="nav-item nav-level-5"><a class="nav-link" href="#统计缺失量"><span class="nav-number">2.2.1.1.</span> <span class="nav-text">统计缺失量</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#原字段填充"><span class="nav-number">2.2.1.2.</span> <span class="nav-text">原字段填充</span></a></li><li class="nav-item nav-level-5"><a class="nav-link" href="#将缺失设置为特征"><span class="nav-number">2.2.1.3.</span> <span class="nav-text">将缺失设置为特征</span></a></li></ol></li><li class="nav-item nav-level-4"><a class="nav-link" href="#列表特征"><span class="nav-number">2.2.2.</span> <span class="nav-text">列表特征</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#数值特征"><span class="nav-number">2.2.3.</span> <span class="nav-text">数值特征</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#分类特征"><span class="nav-number">2.2.4.</span> <span class="nav-text">分类特征</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#群组特征"><span class="nav-number">2.2.5.</span> <span class="nav-text">群组特征</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#scaling"><span class="nav-number">2.2.6.</span> <span class="nav-text">scaling</span></a></li><li class="nav-item nav-level-4"><a class="nav-link" href="#onehot"><span class="nav-number">2.2.7.</span> <span class="nav-text">onehot</span></a></li></ol></li><li class="nav-item nav-level-3"><a class="nav-link" href="#使用模型筛选特征"><span class="nav-number">2.3.</span> <span class="nav-text">使用模型筛选特征</span></a></li></ol></li><li class="nav-item nav-level-2"><a class="nav-link" href="#模型调参"><span class="nav-number">3.</span> <span class="nav-text">模型调参</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">4.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
+      
+
+      
+
+    </div>
+  </aside>
+
+
+        
+      </div>
+    </main>
+
+    <footer id="footer" class="footer">
+      <div class="footer-inner">
+        <div class="copyright">&copy; <span itemprop="copyrightYear">2018</span>
+  <span class="with-love">
+    <i class="fa fa-user"></i>
+  </span>
+  <span class="author" itemprop="copyrightHolder">wangying</span>
+
+  
+</div>
+
+
+  <div class="powered-by">Powered by <a class="theme-link" target="_blank" href="https://hexo.io">Hexo</a></div>
+
+
+
+  <span class="post-meta-divider">|</span>
+
+
+
+  <div class="theme-info">Theme &mdash; <a class="theme-link" target="_blank" href="https://github.com/iissnan/hexo-theme-next">NexT.Mist</a> v5.1.4</div>
+
+
+
+
+        
+
+
+
+
+
+
+
+        
+      </div>
+    </footer>
+
+    
+      <div class="back-to-top">
+        <i class="fa fa-arrow-up"></i>
+        
+      </div>
+    
+
+    
+
+  </div>
+
+  
+
+<script type="text/javascript">
+  if (Object.prototype.toString.call(window.Promise) !== '[object Function]') {
+    window.Promise = null;
+  }
+</script>
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery/index.js?v=2.1.3"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fastclick/lib/fastclick.min.js?v=1.0.6"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/jquery_lazyload/jquery.lazyload.js?v=1.9.7"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/velocity/velocity.ui.min.js?v=1.2.1"></script>
+  
+
+  
+  
+    <script type="text/javascript" src="/lib/fancybox/source/jquery.fancybox.pack.js?v=2.1.5"></script>
+  
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/utils.js?v=5.1.4"></script>
+
+  <script type="text/javascript" src="/js/src/motion.js?v=5.1.4"></script>
+
+
+
+  
+  
+
+  
+  <script type="text/javascript" src="/js/src/scrollspy.js?v=5.1.4"></script>
+<script type="text/javascript" src="/js/src/post-details.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  <script type="text/javascript" src="/js/src/bootstrap.js?v=5.1.4"></script>
+
+
+
+  
+
+
+  
+
+
+
+
+	
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+
+
+
+
+  
+
+  
+
+  
+
+  
+  
+
+  
+
+  
+
+  
+
+</body>
+</html>
