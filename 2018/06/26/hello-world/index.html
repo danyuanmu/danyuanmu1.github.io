@@ -79,14 +79,17 @@
 
 
 
+<meta name="description" content="近期在做的一个项目已阶段性完成，这个项目用的是最简单的算法，但是是我接触的第一个大数据项目，由于在计算机基础知识这块太差，走的不少的弯路，弯路也是路，在此稍作记录，避免今后再犯。核心问题是要求用户*用户的相关性，并取topn,百万级的用户计算的话，就相当于是要计算百万的平方次。我主要尝试了三种方法hive、python和spark，最终还是用的我最熟悉的python交的差，其实我在计算项目开始的时">
 <meta property="og:type" content="article">
-<meta property="og:title" content="title">
-<meta property="og:url" content="http://yoursite.com/2018/05/24/title/index.html">
+<meta property="og:title" content="第一个大数据项目">
+<meta property="og:url" content="http://yoursite.com/2018/06/26/hello-world/index.html">
 <meta property="og:site_name" content="123随手记">
+<meta property="og:description" content="近期在做的一个项目已阶段性完成，这个项目用的是最简单的算法，但是是我接触的第一个大数据项目，由于在计算机基础知识这块太差，走的不少的弯路，弯路也是路，在此稍作记录，避免今后再犯。核心问题是要求用户*用户的相关性，并取topn,百万级的用户计算的话，就相当于是要计算百万的平方次。我主要尝试了三种方法hive、python和spark，最终还是用的我最熟悉的python交的差，其实我在计算项目开始的时">
 <meta property="og:locale" content="default">
-<meta property="og:updated_time" content="2018-05-24T02:44:06.428Z">
+<meta property="og:updated_time" content="2018-06-26T10:12:13.963Z">
 <meta name="twitter:card" content="summary">
-<meta name="twitter:title" content="title">
+<meta name="twitter:title" content="第一个大数据项目">
+<meta name="twitter:description" content="近期在做的一个项目已阶段性完成，这个项目用的是最简单的算法，但是是我接触的第一个大数据项目，由于在计算机基础知识这块太差，走的不少的弯路，弯路也是路，在此稍作记录，避免今后再犯。核心问题是要求用户*用户的相关性，并取topn,百万级的用户计算的话，就相当于是要计算百万的平方次。我主要尝试了三种方法hive、python和spark，最终还是用的我最熟悉的python交的差，其实我在计算项目开始的时">
 
 
 
@@ -116,13 +119,13 @@
 
 
 
-  <link rel="canonical" href="http://yoursite.com/2018/05/24/title/"/>
+  <link rel="canonical" href="http://yoursite.com/2018/06/26/hello-world/"/>
 
 
 
 
 
-  <title>title | 123随手记</title>
+  <title>第一个大数据项目 | 123随手记</title>
   
 
 
@@ -229,7 +232,7 @@
   
   
   <div class="post-block">
-    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/05/24/title/">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/26/hello-world/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
       <meta itemprop="name" content="wangying">
@@ -246,7 +249,7 @@
 
         
         
-          <h1 class="post-title" itemprop="name headline">title</h1>
+          <h1 class="post-title" itemprop="name headline">第一个大数据项目</h1>
         
 
         <div class="post-meta">
@@ -258,8 +261,8 @@
               
                 <span class="post-meta-item-text">Posted on</span>
               
-              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-05-24T10:44:06+08:00">
-                2018-05-24
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-06-26T18:06:04+08:00">
+                2018-06-26
               </time>
             
 
@@ -296,7 +299,10 @@
       
 
       
-        
+        <p>近期在做的一个项目已阶段性完成，这个项目用的是最简单的算法，但是是我接触的第一个大数据项目，由于在计算机基础知识这块太差，走的不少的弯路，弯路也是路，在此稍作记录，避免今后再犯。<br>核心问题是要求用户*用户的相关性，并取topn,百万级的用户计算的话，就相当于是要计算百万的平方次。我主要尝试了三种方法hive、python和spark，最终还是用的我最熟悉的python交的差，其实我在计算项目开始的时候对hive的mapreduce和spark的内部计算原理并不熟悉，才会基于过高的期望，才会去盲目尝试，尽管浪费了很多时间，但是在同事的帮助下终于对这些有了一定的了解，这是最大的收获。</p>
+<h2 id="hive"><a href="#hive" class="headerlink" title="hive"></a>hive</h2><p>特征提取时是用的hive，所以我首先想用hive求出我想要的结果，网上找到一个相关答案：<br>首先将稀疏矩阵转化为如下储存：<br>table:data<br>|    v  |base|w_td |<br>| —–| — | — |<br>|99  |1   |4.0|<br>|99  |2   |3.0|<br>|99  |3   |4.0|<br>|1234|2   |5.0|<br>|1234|3   |2.0|<br>|1234|4   |3.0|</p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://stackoverflow.com/questions/42310655/sql-computation-of-cosine-similarity" target="_blank" rel="noopener">SQL Computation of Cosine Similarity</a></p>
+
       
     </div>
     
@@ -380,8 +386,17 @@
       
 
       
+        <ul class="sidebar-nav motion-element">
+          <li class="sidebar-nav-toc sidebar-nav-active" data-target="post-toc-wrap">
+            Table of Contents
+          </li>
+          <li class="sidebar-nav-overview" data-target="site-overview-wrap">
+            Overview
+          </li>
+        </ul>
+      
 
-      <section class="site-overview-wrap sidebar-panel sidebar-panel-active">
+      <section class="site-overview-wrap sidebar-panel">
         <div class="site-overview">
           <div class="site-author motion-element" itemprop="author" itemscope itemtype="http://schema.org/Person">
             
@@ -423,6 +438,22 @@
         </div>
       </section>
 
+      
+      <!--noindex-->
+        <section class="post-toc-wrap motion-element sidebar-panel sidebar-panel-active">
+          <div class="post-toc">
+
+            
+              
+            
+
+            
+              <div class="post-toc-content"><ol class="nav"><li class="nav-item nav-level-2"><a class="nav-link" href="#hive"><span class="nav-number">1.</span> <span class="nav-text">hive</span></a></li><li class="nav-item nav-level-2"><a class="nav-link" href="#参考文献"><span class="nav-number">2.</span> <span class="nav-text">参考文献</span></a></li></ol></div>
+            
+
+          </div>
+        </section>
+      <!--/noindex-->
       
 
       

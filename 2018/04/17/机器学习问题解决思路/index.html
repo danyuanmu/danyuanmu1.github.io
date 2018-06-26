@@ -79,21 +79,21 @@
 
 
 
-<meta name="description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=train.corr()np">
+<meta name="description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;,,sep=&apos;\t&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=trai">
 <meta property="og:type" content="article">
 <meta property="og:title" content="机器学习实践(1)--建模流程">
 <meta property="og:url" content="http://yoursite.com/2018/04/17/机器学习问题解决思路/index.html">
 <meta property="og:site_name" content="123随手记">
-<meta property="og:description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=train.corr()np">
+<meta property="og:description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;,,sep=&apos;\t&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=trai">
 <meta property="og:locale" content="default">
 <meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/Pearson.png">
 <meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_2.jpg">
 <meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_1.jpg">
 <meta property="og:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/ml_lc_3.jpg">
-<meta property="og:updated_time" content="2018-05-24T06:17:08.089Z">
+<meta property="og:updated_time" content="2018-05-30T07:01:30.963Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="机器学习实践(1)--建模流程">
-<meta name="twitter:description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=train.corr()np">
+<meta name="twitter:description" content="数据概览第一步当然要先看下数据长啥样了，那么有哪些需要关注的点呢？  数据类型？ 有哪些类型需要转换？ 有没有数据缺失？ 特征之间的相关性？  review1234train = pd.read_csv(path + &apos;train.csv&apos;,,sep=&apos;\t&apos;)  train.head(3)train.info()trian.describe() 相关性相关系数123train_corr=trai">
 <meta name="twitter:image" content="http://p7fcyd9m7.bkt.clouddn.com/images/Pearson.png">
 
 
@@ -311,7 +311,7 @@
 <li>有没有数据缺失？</li>
 <li>特征之间的相关性？</li>
 </ul>
-<h3 id="review"><a href="#review" class="headerlink" title="review"></a>review</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">train = pd.read_csv(path + <span class="string">'train.csv'</span>)  </span><br><span class="line">train.head(<span class="number">3</span>)</span><br><span class="line">train.info()</span><br><span class="line">trian.describe()</span><br></pre></td></tr></table></figure>
+<h3 id="review"><a href="#review" class="headerlink" title="review"></a>review</h3><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">train = pd.read_csv(path + <span class="string">'train.csv'</span>,,sep=<span class="string">'\t'</span>)  </span><br><span class="line">train.head(<span class="number">3</span>)</span><br><span class="line">train.info()</span><br><span class="line">trian.describe()</span><br></pre></td></tr></table></figure>
 <h3 id="相关性"><a href="#相关性" class="headerlink" title="相关性"></a>相关性</h3><h4 id="相关系数"><a href="#相关系数" class="headerlink" title="相关系数"></a>相关系数</h4><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">train_corr=train.corr()</span><br><span class="line">np.fill_diagonal(train_corr.values, np.nan)   <span class="comment">#填充对角线</span></span><br><span class="line">train_corr[train_corr&gt;<span class="number">0.9</span>].unstack().dropna().to_frame()</span><br></pre></td></tr></table></figure>
 <h4 id="皮尔森相关性"><a href="#皮尔森相关性" class="headerlink" title="皮尔森相关性"></a>皮尔森相关性</h4><p>Pearson Correlation Heatmap，生成一个热力图<br><figure class="highlight python"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">colormap = plt.cm.RdBu</span><br><span class="line">plt.figure(figsize=(<span class="number">14</span>,<span class="number">12</span>))    <span class="comment">#太小了看不清字</span></span><br><span class="line">sns.heatmap(train.astype(float).corr(),linewidths=<span class="number">0.1</span>,vmax=<span class="number">1.0</span>, </span><br><span class="line">            square=<span class="keyword">True</span>, cmap=colormap, linecolor=<span class="string">'white'</span>, annot=<span class="keyword">True</span>)</span><br></pre></td></tr></table></figure></p>
 <img src="http://p7fcyd9m7.bkt.clouddn.com/images/Pearson.png">
@@ -395,7 +395,7 @@
         <div class="post-nav">
           <div class="post-nav-next post-nav-item">
             
-              <a href="/2018/04/17/hello-world/" rel="next" title="Hello World">
+              <a href="/2018/04/17/第一个大数据项目/" rel="next" title="Hello World">
                 <i class="fa fa-chevron-left"></i> Hello World
               </a>
             
