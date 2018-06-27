@@ -301,14 +301,80 @@
         
           
             <p>近期在做的一个项目已阶段性完成，这个项目用的是最简单的算法，但是是我接触的第一个大数据项目，由于在计算机基础知识这块太差，走的不少的弯路，弯路也是路，在此稍作记录，避免今后再犯。<br>核心问题是要求用户*用户的相关性，并取topn,百万级的用户计算的话，就相当于是要计算百万的平方次。我主要尝试了三种方法hive、python和spark，最终还是用的我最熟悉的python交的差，其实我在计算项目开始的时候对hive的mapreduce和spark的内部计算原理并不熟悉，才会基于过高的期望，才会去盲目尝试，尽管浪费了很多时间，但是在同事的帮助下终于对这些有了一定的了解，这是最大的收获。</p>
-<h2 id="hive"><a href="#hive" class="headerlink" title="hive"></a>hive</h2><p>特征提取时是用的hive，所以我首先想用hive求出我想要的结果，网上找到一个相关答案：<br>首先将稀疏矩阵转化为如下储存：<br>table:data<br>  v |base|w_td<br>— | – | –<br>99  |1   |4.0<br>99  |2   |3.0<br>99  |3   |4.0<br>1234|2   |5.0<br>1234|3   |2.0<br>1234|4   |3.0</p>
+<h2 id="hive"><a href="#hive" class="headerlink" title="hive"></a>hive</h2><p>特征提取时是用的hive，所以我首先想用hive求出我想要的结果，网上找到一个相关答案：<br>首先将稀疏矩阵转化为如下储存：<br>table:data</p>
+<table>
+<thead>
+<tr>
+<th>v</th>
+<th>base</th>
+<th>w_td </th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>99</td>
+<td>1</td>
+<td>4.0</td>
+</tr>
+<tr>
+<td>99</td>
+<td>2</td>
+<td>3.0</td>
+</tr>
+<tr>
+<td>99</td>
+<td>3</td>
+<td>4.0</td>
+</tr>
+<tr>
+<td>1234</td>
+<td>2</td>
+<td>5.0</td>
+</tr>
+<tr>
+<td>1234</td>
+<td>3</td>
+<td>2.0</td>
+</tr>
+<tr>
+<td>1234</td>
+<td>4</td>
+<td>3.0</td>
+</tr>
+</tbody>
+</table>
 <figure class="highlight sql"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br></pre></td><td class="code"><pre><span class="line">with norms as (</span><br><span class="line">    <span class="keyword">select</span> v,</span><br><span class="line">        <span class="keyword">sum</span>(w_td * w_td) <span class="keyword">as</span> w2</span><br><span class="line">    <span class="keyword">from</span> <span class="keyword">data</span></span><br><span class="line">    <span class="keyword">group</span> <span class="keyword">by</span> v</span><br><span class="line">)</span><br><span class="line"><span class="keyword">select</span> </span><br><span class="line">    x.v <span class="keyword">as</span> ego,y.v <span class="keyword">as</span> v,nx.w2 <span class="keyword">as</span> x2, ny.w2 <span class="keyword">as</span> y2,</span><br><span class="line">    <span class="keyword">sum</span>(x.w_td * y.w_td) <span class="keyword">as</span> innerproduct,</span><br><span class="line">    <span class="keyword">sum</span>(x.w_td * y.w_td) / <span class="keyword">sqrt</span>(nx.w2 * ny.w2) <span class="keyword">as</span> cosinesimilarity</span><br><span class="line"><span class="keyword">from</span> <span class="keyword">data</span> <span class="keyword">as</span> x</span><br><span class="line"><span class="keyword">join</span> <span class="keyword">data</span> <span class="keyword">as</span> y</span><br><span class="line">    <span class="keyword">on</span> (x.base=y.base)</span><br><span class="line"><span class="keyword">join</span> norms <span class="keyword">as</span> nx</span><br><span class="line">    <span class="keyword">on</span> (nx.v=x.v)</span><br><span class="line"><span class="keyword">join</span> norms <span class="keyword">as</span> ny</span><br><span class="line">    <span class="keyword">on</span> (ny.v=y.v)</span><br><span class="line"><span class="keyword">where</span> x.v &lt; y.v</span><br><span class="line"><span class="keyword">group</span> <span class="keyword">by</span> <span class="number">1</span>,<span class="number">2</span>,<span class="number">3</span>,<span class="number">4</span></span><br><span class="line"><span class="keyword">order</span> <span class="keyword">by</span> <span class="number">6</span> <span class="keyword">desc</span></span><br></pre></td></tr></table></figure>
 <p>yields</p>
-<h2 id="ego-v-x2-y2-innerproduct-cosinesimilarity"><a href="#ego-v-x2-y2-innerproduct-cosinesimilarity" class="headerlink" title="ego|v   |x2  |y2  |innerproduct|cosinesimilarity"></a>ego|v   |x2  |y2  |innerproduct|cosinesimilarity</h2><p>99 |1234|41.0|38.0|23.0        |0.5826987807288609</p>
+<table>
+<thead>
+<tr>
+<th>ego</th>
+<th>v</th>
+<th>x2</th>
+<th>y2</th>
+<th>innerproduct</th>
+<th>cosinesimilarity</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>99</td>
+<td>1234</td>
+<td>41.0</td>
+<td>38.0</td>
+<td>23.0</td>
+<td>0.5826987807288609</td>
+</tr>
+</tbody>
+</table>
 <p>我还把这个sql给优化了一下：把cosine分母部分提出来到外部计算，最后只需要join一次，group一个value，但是hive仍然是卡住不动。。。。</p>
-<p><strong>fail reason:（这部分算是我自己的理解，不晓滴是不是准确）<br>hive是基于mapreduce计算，MapTask会将处理的临时结果放在磁盘上，并分成若干个partition，再被ReduceTask处理。百万级用户的平方光是写盘的时间就不可估计，代码嗝屁也是正常。
+<p><strong>fail reason:（这部分算是我自己的理解，不晓滴是不是准确）<br>hive是基于mapreduce计算，MapTask会将处理的临时结果放在磁盘上，并分成若干个partition，再被ReduceTask处理。百万级用户的平方光是写盘的时间就不可估计，代码卡死也是正常。
 </strong></p>
-<h2 id="spark"><a href="#spark" class="headerlink" title="spark"></a>spark</h2><h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://stackoverflow.com/questions/42310655/sql-computation-of-cosine-similarity" target="_blank" rel="noopener">SQL Computation of Cosine Similarity</a></p>
+<h2 id="spark"><a href="#spark" class="headerlink" title="spark"></a>spark</h2><p>hive尽管没跑出来，但也没花太多时间就弃了，spark我可以说是寄予厚望，花了有一周的时间，但是也嗝屁了。。。<br>下面就是愉快的病急乱投医模式：</p>
+<h3 id="尝试1：ALS"><a href="#尝试1：ALS" class="headerlink" title="尝试1：ALS"></a>尝试1：ALS</h3><p>ALS是spark内置的推荐系统模型，求相关性用的向量的数据结构(DoubleMatrix),但是效率不行。值得一提的是ALS做矩阵分解还是挺快的，今后做特征降维可以考虑用。<br><figure class="highlight scala"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br><span class="line">41</span><br><span class="line">42</span><br><span class="line">43</span><br><span class="line">44</span><br><span class="line">45</span><br><span class="line">46</span><br><span class="line">47</span><br><span class="line">48</span><br><span class="line">49</span><br><span class="line">50</span><br><span class="line">51</span><br><span class="line">52</span><br><span class="line">53</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">/* 需加载包： --packages org.jblas:jblas:1.2.4  */</span></span><br><span class="line"></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.mllib.recommendation.<span class="type">ALS</span></span><br><span class="line"><span class="keyword">import</span> org.apache.spark.mllib.recommendation.<span class="type">Rating</span></span><br><span class="line"><span class="keyword">import</span> org.jblas.<span class="type">DoubleMatrix</span></span><br><span class="line"><span class="comment">//输入为user-object-score格式</span></span><br><span class="line"><span class="keyword">val</span> path=<span class="string">".."</span></span><br><span class="line"><span class="keyword">val</span> rawData=sc.textFile(path,<span class="number">500</span>)</span><br><span class="line">rawData.first()</span><br><span class="line"><span class="keyword">val</span> rawRatings=rawData.map(_.split(<span class="string">"\t"</span>))</span><br><span class="line"><span class="comment">//转化为rawRatings对象</span></span><br><span class="line"><span class="keyword">val</span> ratings = rawRatings.map &#123;<span class="keyword">case</span> <span class="type">Array</span>(pinid,biz_name_id,value) =&gt;</span><br><span class="line"><span class="type">Rating</span>(pinid.toInt, biz_name_id.toInt, value.toDouble)&#125;</span><br><span class="line"><span class="comment">//（ratings,模型因子个数,迭代次数，控制过拟合程度的参数）</span></span><br><span class="line"><span class="keyword">val</span> model = <span class="type">ALS</span>.train(ratings,<span class="number">30</span>,<span class="number">10</span>,<span class="number">0.01</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment">//model.userFeatures：用户矩阵；model.productFeatures：商品矩阵</span></span><br><span class="line"><span class="keyword">val</span> userFactor = model.userFeatures.lookup(<span class="number">1</span>).head </span><br><span class="line"><span class="comment">//转化为向量</span></span><br><span class="line"><span class="keyword">val</span> userVector = <span class="keyword">new</span> <span class="type">DoubleMatrix</span>(userFactor)</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">cosineSimilarity</span></span>(vec1: <span class="type">DoubleMatrix</span>, vec2: <span class="type">DoubleMatrix</span>): <span class="type">Double</span>=</span><br><span class="line">&#123;</span><br><span class="line">    vec1.dot(vec2) / (vec1.norm2() * vec2.norm2())</span><br><span class="line">&#125;</span><br><span class="line">cosineSimilarity(userVector,userVector)</span><br><span class="line"><span class="comment">//各个物品的余弦相似度</span></span><br><span class="line"><span class="keyword">val</span> sims=model.userFeatures.map&#123;<span class="keyword">case</span>(id,factor)=&gt;</span><br><span class="line">    <span class="keyword">val</span> factorVector=<span class="keyword">new</span> <span class="type">DoubleMatrix</span>(factor)</span><br><span class="line">    <span class="keyword">val</span> sim=cosineSimilarity(factorVector, userVector)</span><br><span class="line">    (id,sim)</span><br><span class="line">&#125;</span><br><span class="line"><span class="comment">//取topn</span></span><br><span class="line"><span class="keyword">val</span> sortedSims=sims.top(<span class="number">100</span>)(<span class="type">Ordering</span>.by[(<span class="type">Int</span>, <span class="type">Double</span>),<span class="type">Double</span>] &#123;<span class="keyword">case</span>(id, similarity)=&gt;similarity&#125;)</span><br><span class="line">println(sortedSims.take(<span class="number">10</span>).mkString(<span class="string">"\n"</span>))</span><br><span class="line"></span><br><span class="line"><span class="function"><span class="keyword">def</span> <span class="title">user2usersimilarity</span></span>(userid:<span class="type">Integer</span>, recNumber:<span class="type">Integer</span>)=&#123;</span><br><span class="line">    <span class="keyword">val</span> userFactor=model.userFeatures.lookup(userid).head</span><br><span class="line">    <span class="keyword">val</span> userVector=<span class="keyword">new</span> <span class="type">DoubleMatrix</span>(userFactor)</span><br><span class="line">    <span class="keyword">val</span> s1=cosineSimilarity(userVector,userVector)</span><br><span class="line">    <span class="keyword">val</span> sims=model.userFeatures.map&#123;<span class="keyword">case</span>(id,factor)=&gt;</span><br><span class="line">        <span class="keyword">val</span> factorVector=<span class="keyword">new</span> <span class="type">DoubleMatrix</span>(factor)</span><br><span class="line">        <span class="keyword">val</span> sim=cosineSimilarity(factorVector, userVector)</span><br><span class="line">        (id,sim)</span><br><span class="line">    &#125;</span><br><span class="line">    <span class="keyword">val</span> sortedSims=sims.top(recNumber+<span class="number">1</span>)(<span class="type">Ordering</span>.by[(<span class="type">Int</span>, <span class="type">Double</span>),<span class="type">Double</span>] &#123;<span class="keyword">case</span>(id, similarity)=&gt;similarity&#125;)</span><br><span class="line">    <span class="keyword">val</span> <span class="type">B</span>=sortedSims.map(k=&gt;userid.toString+<span class="string">","</span>+k._1.toString+<span class="string">","</span>+k._2.toString)</span><br><span class="line">    <span class="type">B</span></span><br><span class="line">&#125;</span><br><span class="line"><span class="keyword">val</span> r = model.userFeatures.flatMap&#123; <span class="keyword">case</span> (id, factor) =&gt;</span><br><span class="line">    <span class="keyword">val</span> top1k = user2usersimilarity(id, <span class="number">1000</span>)</span><br><span class="line">    top1k</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure></p>
+<p><strong>fail reason:<br>函数user2usersimilarity中其实对每个user都是跨分区操作了~
+</strong></p>
+<h2 id="参考文献"><a href="#参考文献" class="headerlink" title="参考文献"></a>参考文献</h2><p><a href="https://stackoverflow.com/questions/42310655/sql-computation-of-cosine-similarity" target="_blank" rel="noopener">SQL Computation of Cosine Similarity</a><br><a href="http://blog.51cto.com/jaydenwang/1843048" target="_blank" rel="noopener">Hadoop之MapReduce工作原理</a></p>
 
           
         
