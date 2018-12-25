@@ -229,6 +229,308 @@
   
   
   <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/12/25/readme/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangying">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="123随手记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/12/25/readme/" itemprop="url">Untitled</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-12-25T16:37:43+08:00">
+                2018-12-25
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            <h1 id="用户关系测度项目"><a href="#用户关系测度项目" class="headerlink" title="用户关系测度项目"></a>用户关系测度项目</h1><p>本项目基于用户在京东金融上的行为偏好，找到每个用户的关联度最高的1000用户，通过关联用户的偏好为该用户进行推荐</p>
+<h2 id="目录结构"><a href="#目录结构" class="headerlink" title="目录结构"></a>目录结构</h2><table>
+<thead>
+<tr>
+<th>目录</th>
+<th>解释</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>log</td>
+<td>日志</td>
+</tr>
+<tr>
+<td>reuslt</td>
+<td>python执行结果</td>
+</tr>
+<tr>
+<td>src</td>
+<td>模型代码</td>
+</tr>
+<tr>
+<td>src/get_features.sh</td>
+<td>提取特征，结果存于hive表</td>
+</tr>
+<tr>
+<td>src/data_haddle.sh</td>
+<td>数据处理，结果存于hive表,为python的输入</td>
+</tr>
+<tr>
+<td>src/cal_cosine.py</td>
+<td>python计算相关性，结果存于本地</td>
+</tr>
+<tr>
+<td>src/result_load.sh</td>
+<td>将python结果导入hive</td>
+</tr>
+<tr>
+<td>src/get_Process.sh</td>
+<td>流程汇总</td>
+</tr>
+</tbody>
+</table>
+<h2 id="使用指南"><a href="#使用指南" class="headerlink" title="使用指南"></a>使用指南</h2><p>执行入口：<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./get_process.sh <span class="string">'06'</span> <span class="string">'25'</span></span><br></pre></td></tr></table></figure></p>
+<p>两个参数：月、日，作为字符串传入，该日期为选中当天的活跃用户作为训练样本；<br>期间所有的中间表及结果表都存于tech_dev中。</p>
+<h2 id="建模流程"><a href="#建模流程" class="headerlink" title="建模流程"></a>建模流程</h2><h3 id="src-get-features-sh"><a href="#src-get-features-sh" class="headerlink" title="src/get_features.sh"></a>src/get_features.sh</h3><p>获取1天活跃用户的34个特征，input:month,day：<br>ep:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./get_features.sh <span class="string">'06'</span> <span class="string">'25'</span></span><br></pre></td></tr></table></figure></p>
+<p>依次获取以下特征表：</p>
+<ul>
+<li>1、活跃用户列表 : userrelation_${month}${day}_active_pins</li>
+<li>2、大理财相关分类持仓表：userrelation_${month}${day}_fin_hold</li>
+<li>3、小金库分类持仓表：userrelation_${month}${day}_xjk_hold</li>
+<li>4、小白条当前欠款表：userrelation_${month}${day}_xbt_hold</li>
+<li>5、金条当前欠款表：userrelation_${month}${day}_jt_hold</li>
+<li>6、各类保险一年内购买金额表：userrelation_${month}${day}_bx_hold</li>
+<li>7、众筹、基金、大白条、银行+、小白定投相应金额表：userrelation_${month}${day}_join_hold</li>
+</ul>
+<p>将上面的表合并为总的特征表：userrelation_${month}${day}_features，特征如下：</p>
+<h3 id="src-data-haddle-sh"><a href="#src-data-haddle-sh" class="headerlink" title="src/data_haddle.sh"></a>src/data_haddle.sh</h3><p>这部分主要做两件事：1、列归一化;2、cosine相关性预处理，即提取出相关性公式的分母部分。</p>
+<p>ep:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./data_haddle.sh <span class="string">'06'</span> <span class="string">'25'</span></span><br></pre></td></tr></table></figure></p>
+<p>得到处理后的特征表：userrelation_${month}${day}_max_min_v11，即为python的input</p>
+<h3 id="src-cal-cosine-py"><a href="#src-cal-cosine-py" class="headerlink" title="src/cal_cosine.py"></a>src/cal_cosine.py</h3><p>计算cosine相似性,并提取每个用户最相近的1000个用户，结果储存到本地。多进程执行。</p>
+<p>ep:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">python cal_cosine.py <span class="string">'06'</span> <span class="string">'25'</span></span><br></pre></td></tr></table></figure></p>
+<h3 id="src-result-load-sh"><a href="#src-result-load-sh" class="headerlink" title="src/result_load.sh"></a>src/result_load.sh</h3><p>将python结果导入hive表，匹配上实际的pin,并排名。<br>ep:<br><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">./result_load.sh <span class="string">'06'</span> <span class="string">'25'</span></span><br></pre></td></tr></table></figure></p>
+<p>userrelation_${month}${day}_rankresult：即最终的结果表；每个分区（pinid_part）储存10w用户的相关用户。</p>
+
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
+    <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/10/23/scala_面向对象/">
+
+    <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
+      <meta itemprop="name" content="wangying">
+      <meta itemprop="description" content="">
+      <meta itemprop="image" content="/images/avatar.gif">
+    </span>
+
+    <span hidden itemprop="publisher" itemscope itemtype="http://schema.org/Organization">
+      <meta itemprop="name" content="123随手记">
+    </span>
+
+    
+      <header class="post-header">
+
+        
+        
+          <h1 class="post-title" itemprop="name headline">
+                
+                <a class="post-title-link" href="/2018/10/23/scala_面向对象/" itemprop="url">Untitled</a></h1>
+        
+
+        <div class="post-meta">
+          <span class="post-time">
+            
+              <span class="post-meta-item-icon">
+                <i class="fa fa-calendar-o"></i>
+              </span>
+              
+                <span class="post-meta-item-text">Posted on</span>
+              
+              <time title="Post created" itemprop="dateCreated datePublished" datetime="2018-10-23T17:18:42+08:00">
+                2018-10-23
+              </time>
+            
+
+            
+
+            
+          </span>
+
+          
+
+          
+            
+          
+
+          
+          
+
+          
+
+          
+
+          
+
+        </div>
+      </header>
+    
+
+    
+    
+    
+    <div class="post-body" itemprop="articleBody">
+
+      
+      
+
+      
+        
+          
+            
+          
+        
+      
+    </div>
+    
+    
+    
+
+    
+
+    
+
+    
+
+    <footer class="post-footer">
+      
+
+      
+
+      
+
+      
+      
+        <div class="post-eof"></div>
+      
+    </footer>
+  </div>
+  
+  
+  
+  </article>
+
+
+    
+      
+
+  
+
+  
+  
+  
+
+  <article class="post post-type-normal" itemscope itemtype="http://schema.org/Article">
+  
+  
+  
+  <div class="post-block">
     <link itemprop="mainEntityOfPage" href="http://yoursite.com/2018/06/26/第一个大数据项目/">
 
     <span hidden itemprop="author" itemscope itemtype="http://schema.org/Person">
@@ -932,7 +1234,7 @@
               
                 <a href="/archives/">
               
-                  <span class="site-state-item-count">4</span>
+                  <span class="site-state-item-count">6</span>
                   <span class="site-state-item-name">posts</span>
                 </a>
               </div>
